@@ -73,12 +73,19 @@ typedef void (^TBXMLFailureBlock)(TBXML *, NSError *);
 // ================================================================================================
 //  Structures
 // ================================================================================================
+
+/** The TBXMLAttribute structure holds information about a single XML attribute. The structure holds the attribute name, value and next sibling attribute. This structure allows us to create a linked list of attributes belonging to a specific element.
+ */
 typedef struct _TBXMLAttribute {
 	char * name;
 	char * value;
 	struct _TBXMLAttribute * next;
 } TBXMLAttribute;
 
+
+
+/** The TBXMLElement structure holds information about a single XML element. The structure holds the element name & text along with pointers to the first attribute, parent element, first child element and first sibling element. Using this structure, we can create a linked list of TBXMLElements to map out an entire XML file.
+ */
 typedef struct _TBXMLElement {
 	char * name;
 	char * text;
@@ -95,21 +102,31 @@ typedef struct _TBXMLElement {
 	
 } TBXMLElement;
 
+
+
+/** The TBXMLElementBuffer is a structure that holds a buffer of TBXMLElements. When the buffer of elements is used, an additional buffer is created and linked to the previous one. This allows for efficient memory allocation/deallocation elements.
+ */
 typedef struct _TBXMLElementBuffer {
 	TBXMLElement * elements;
 	struct _TBXMLElementBuffer * next;
 	struct _TBXMLElementBuffer * previous;
 } TBXMLElementBuffer;
 
+
+
+/** The TBXMLAttributeBuffer is a structure that holds a buffer of TBXMLAttributes. When the buffer of attributes is used, an additional buffer is created and linked to the previous one. This allows for efficient memeory allocation/deallocation of attributes.
+ */
 typedef struct _TBXMLAttributeBuffer {
 	TBXMLAttribute * attributes;
 	struct _TBXMLAttributeBuffer * next;
 	struct _TBXMLAttributeBuffer * previous;
 } TBXMLAttributeBuffer;
 
+
 // ================================================================================================
 //  TBXML Public Interface
 // ================================================================================================
+
 @interface TBXML : NSObject {
 	
 @private
@@ -125,26 +142,29 @@ typedef struct _TBXMLAttributeBuffer {
 	long bytesLength;
 }
 
+
 @property (nonatomic, readonly) TBXMLElement * rootXMLElement;
 
-+ (id)tbxmlWithXMLString:(NSString*)aXMLString __attribute__((deprecated));
 + (id)tbxmlWithXMLString:(NSString*)aXMLString error:(NSError **)error;
-+ (id)tbxmlWithXMLData:(NSData*)aData __attribute__((deprecated));
 + (id)tbxmlWithXMLData:(NSData*)aData error:(NSError **)error;
-+ (id)tbxmlWithXMLFile:(NSString*)aXMLFile __attribute__((deprecated));
 + (id)tbxmlWithXMLFile:(NSString*)aXMLFile error:(NSError **)error;
-+ (id)tbxmlWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension __attribute__((deprecated));
 + (id)tbxmlWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension error:(NSError **)error;
 
++ (id)tbxmlWithXMLString:(NSString*)aXMLString __attribute__((deprecated));
++ (id)tbxmlWithXMLData:(NSData*)aData __attribute__((deprecated));
++ (id)tbxmlWithXMLFile:(NSString*)aXMLFile __attribute__((deprecated));
++ (id)tbxmlWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension __attribute__((deprecated));
+
+
+- (id)initWithXMLString:(NSString*)aXMLString error:(NSError **)error;
+- (id)initWithXMLData:(NSData*)aData error:(NSError **)error;
+- (id)initWithXMLFile:(NSString*)aXMLFile error:(NSError **)error;
+- (id)initWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension error:(NSError **)error;
 
 - (id)initWithXMLString:(NSString*)aXMLString __attribute__((deprecated));
-- (id)initWithXMLString:(NSString*)aXMLString error:(NSError **)error;
 - (id)initWithXMLData:(NSData*)aData __attribute__((deprecated));
-- (id)initWithXMLData:(NSData*)aData error:(NSError **)error;
 - (id)initWithXMLFile:(NSString*)aXMLFile __attribute__((deprecated));
-- (id)initWithXMLFile:(NSString*)aXMLFile error:(NSError **)error;
 - (id)initWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension __attribute__((deprecated));
-- (id)initWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension error:(NSError **)error;
 
 
 - (NSError *) decodeData:(NSData*)data;
