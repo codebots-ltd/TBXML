@@ -48,7 +48,7 @@
 	// Traverse all elements from an unknown XML document. Output is displayed in the log window.
 	[self loadUnknownXML];
 	
-	// Load the books xml file into a class structure for displaying through tableviews
+	// Load the books xml file into a class structure for displaying through tableviews.
 	[self loadBooks];
 	
     // Override point for customization after app launch    
