@@ -13,13 +13,13 @@ TBXML is incredibly fast! Check out this post for a good comparison of XML parse
 * XML parsing should be achieved in the shortest possible time
 * It shall be easy to write programs that utilise TBXML
 
+### What Now?
 
-### Check out the Wiki for more information
-* [Loading an XML Document](https://github.com/71squared/TBXML/wiki/2.-Loading-an-XML-Document)<br/>
-* [Extracting Elements](https://github.com/71squared/TBXML/wiki/3.-Extracting-Elements)<br/>
-* [Extracting Attributes](https://github.com/71squared/TBXML/wiki/4.-Extracting-Attributes)<br/>
-* [Extracting Element Text](https://github.com/71squared/TBXML/wiki/5.-Extracting-Element-Text)<br/>
-* [Traversing Unknown Elements and Attributes](https://github.com/71squared/TBXML/wiki/6.-Traversing-Unknown-Elements-and-Attributes)<br/>
+View the "TBXML" wiki page to get find out how TBXML works. It contains many examples showing you how to use TBXML to parse your XML files. There are 2 complementary additions to extend the functionality of TBXML. These add the ability to automatically decompress files and perform asynchronous HTTP requests.
+
+[TBXML](https://github.com/71squared/TBXML/wiki/TBXML)   
+[TBXML+Compression](https://github.com/71squared/TBXML/wiki/TBXML+Compression)   
+[TBXML+HTTP](https://github.com/71squared/TBXML/wiki/TBXML+HTTP)   
 
 
 <br/>

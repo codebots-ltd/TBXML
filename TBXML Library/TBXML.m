@@ -106,7 +106,7 @@
         [self allocateBytesOfLength:[aXMLString lengthOfBytesUsingEncoding:NSUTF8StringEncoding] error:error];
         
         // if an error occured, return
-        if (error != nil) 
+        if (*error != nil) 
             return self;
         
 		// copy string to byte array
