@@ -29,31 +29,27 @@
 
 @class TBXML;
 
-// ================================================================================================
-//  Block Callbacks
-// ================================================================================================
-typedef void (^TBXMLSuccessBlock)(TBXML *);
-typedef void (^TBXMLFailureBlock)(TBXML *, NSError *);
-
 
 // ================================================================================================
 //  Error Codes
 // ================================================================================================
-#define D_TBXML_DATA_NIL 100
-#define D_TBXML_DATA_NIL_TEXT @"data is nil"
-
-#define D_TBXML_DECODE_FAILURE 101
-#define D_TBXML_DECODE_FAILURE_TEXT @"decode failure"
-
-#define D_TBXML_MEMORY_ALLOC_FAILURE 102
-#define D_TBXML_MEMORY_ALLOC_FAILURE_TEXT @"unable to allocate memory"
-
-#define D_TBXML_ROOT_NOT_FOUND 103
-#define D_TBXML_ROOT_NOT_FOUND_TEXT @"document root not found"
-
-#define D_TBXML_FILE_NOT_FOUND_IN_BUNDLE 104
-#define D_TBXML_FILE_NOT_FOUND_IN_BUNDLE_TEXT @"file not found in bundle"
-
+enum TBXMLErrorCodes {
+    D_TBXML_DATA_NIL,
+    D_TBXML_DECODE_FAILURE,
+    D_TBXML_MEMORY_ALLOC_FAILURE,
+    D_TBXML_ROOT_NOT_FOUND,
+    D_TBXML_FILE_NOT_FOUND_IN_BUNDLE,
+    
+    D_TBXML_ELEMENT_IS_NIL,
+    D_TBXML_ELEMENT_NAME_IS_NIL,
+    D_TBXML_ELEMENT_NOT_FOUND,
+    D_TBXML_ELEMENT_TEXT_IS_NIL,
+    D_TBXML_ATTRIBUTE_IS_NIL,
+    D_TBXML_ATTRIBUTE_NAME_IS_NIL,
+    D_TBXML_ATTRIBUTE_VALUE_IS_NIL,
+    D_TBXML_ATTRIBUTE_NOT_FOUND,
+    D_TBXML_PARAM_NAME_IS_NIL
+};
 
 
 // ================================================================================================
@@ -102,8 +98,6 @@ typedef struct _TBXMLElement {
 	
 } TBXMLElement;
 
-
-
 /** The TBXMLElementBuffer is a structure that holds a buffer of TBXMLElements. When the buffer of elements is used, an additional buffer is created and linked to the previous one. This allows for efficient memory allocation/deallocation elements.
  */
 typedef struct _TBXMLElementBuffer {
@@ -121,6 +115,14 @@ typedef struct _TBXMLAttributeBuffer {
 	struct _TBXMLAttributeBuffer * next;
 	struct _TBXMLAttributeBuffer * previous;
 } TBXMLAttributeBuffer;
+
+
+// ================================================================================================
+//  Block Callbacks
+// ================================================================================================
+typedef void (^TBXMLSuccessBlock)(TBXML *);
+typedef void (^TBXMLFailureBlock)(TBXML *, NSError *);
+typedef void (^TBXMLIterateBlock)(TBXMLElement *);
 
 
 // ================================================================================================
@@ -178,13 +180,22 @@ typedef struct _TBXMLAttributeBuffer {
 @interface TBXML (StaticFunctions)
 
 + (NSString*) elementName:(TBXMLElement*)aXMLElement;
++ (NSString*) elementName:(TBXMLElement*)aXMLElement error:(NSError **)error;
 + (NSString*) textForElement:(TBXMLElement*)aXMLElement;
 + (NSString*) valueOfAttributeNamed:(NSString *)aName forElement:(TBXMLElement*)aXMLElement;
 
 + (NSString*) attributeName:(TBXMLAttribute*)aXMLAttribute;
++ (NSString*) attributeName:(TBXMLAttribute*)aXMLAttribute error:(NSError **)error;
 + (NSString*) attributeValue:(TBXMLAttribute*)aXMLAttribute;
 
 + (TBXMLElement*) nextSiblingNamed:(NSString*)aName searchFromElement:(TBXMLElement*)aXMLElement;
 + (TBXMLElement*) childElementNamed:(NSString*)aName parentElement:(TBXMLElement*)aParentXMLElement;
+
+
+/** Iterate through all elements found using query.
+ 
+ Inspiration taken from John Blanco's RaptureXML https://github.com/ZaBlanc/RaptureXML
+ */
++ (void)iterateElementsForQuery:(NSString *)query fromElement:(TBXMLElement *)anElement withBlock:(TBXMLIterateBlock)iterateBlock;
 
 @end

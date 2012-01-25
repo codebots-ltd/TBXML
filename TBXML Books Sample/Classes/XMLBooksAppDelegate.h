@@ -46,6 +46,7 @@
 - (void) loadXMLString;
 - (void) loadXMLData;
 - (void) loadBooks;
+- (void) iterateBooks;
 - (void) loadUnknownXML;
 - (void) traverseElement:(TBXMLElement *)element;
 

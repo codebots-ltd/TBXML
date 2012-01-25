@@ -32,6 +32,9 @@
 // Private methods
 // ================================================================================================
 @interface TBXML (Private)
++ (NSString *) errorTextForCode:(int)code;
++ (NSError *) errorWithCode:(int)code;
++ (NSError *) errorWithCode:(int)code userInfo:(NSDictionary *)userInfo;
 - (void) decodeBytes;
 - (void) allocateBytesOfLength:(long)length error:(NSError **)error;
 - (TBXMLElement*) nextAvailableElement;
@@ -135,6 +138,21 @@
     return self;
 }
 
+- (id)initWithXMLFile:(NSString*)aXMLFile {
+    return [self initWithXMLFile:aXMLFile error:nil];
+}
+
+- (id)initWithXMLFile:(NSString*)aXMLFile error:(NSError **)error {
+    NSString * filename = [aXMLFile stringByDeletingPathExtension];
+    NSString * extension = [aXMLFile pathExtension];
+    
+    self = [self initWithXMLFile:filename fileExtension:extension error:error];
+	if (self != nil) {
+        
+	}
+	return self;
+}
+
 - (id)initWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension {
     return [self initWithXMLFile:aXMLFile fileExtension:aFileExtension error:nil];
 }
@@ -147,55 +165,28 @@
         NSString * bundlePath = [[NSBundle mainBundle] pathForResource:aXMLFile ofType:aFileExtension];
         
         if (!bundlePath) {
-            *error = [NSError errorWithDomain:D_TBXML_DOMAIN 
-                                         code:D_TBXML_FILE_NOT_FOUND_IN_BUNDLE 
-                                     userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithString:D_TBXML_FILE_NOT_FOUND_IN_BUNDLE_TEXT], NSLocalizedDescriptionKey, 
-                                                                                         [aXMLFile stringByAppendingPathExtension:aFileExtension], NSFilePathErrorKey, nil]];
+            
+            NSDictionary * userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[aXMLFile stringByAppendingPathExtension:aFileExtension], NSFilePathErrorKey, nil];
+            
+            *error = [TBXML errorWithCode:D_TBXML_FILE_NOT_FOUND_IN_BUNDLE userInfo:userInfo];
+
         } else {
+            SEL dataWithUncompressedContentsOfFile = @selector(dataWithUncompressedContentsOfFile:);
+            
             // Get uncompressed file contents if TBXML+Compression has been included
-            if ([[NSData class] respondsToSelector:@selector(dataWithUncompressedContentsOfFile:)]) {
-                data = [[NSData class] performSelector:@selector(dataWithUncompressedContentsOfFile:) withObject:bundlePath];
+            if ([[NSData class] respondsToSelector:dataWithUncompressedContentsOfFile]) {
+                
+                #pragma clang diagnostic push
+                #pragma clang diagnostic ignored "-Warc-performSelector-leaks"
+                data = [[NSData class] performSelector:dataWithUncompressedContentsOfFile withObject:bundlePath];
+                #pragma clang diagnostic pop   
+
             } else {
                 data = [NSData dataWithContentsOfFile:bundlePath];
             }
-            
             
             // decode data
             *error = [self decodeData:data];
-        }
-	}
-	return self;
-}
-
-- (id)initWithXMLFile:(NSString*)aXMLFile {
-    return [self initWithXMLFile:aXMLFile error:nil];
-}
-
-- (id)initWithXMLFile:(NSString*)aXMLFile error:(NSError **)error {
-	self = [self init];
-	if (self != nil) {
-		NSString * filename = [aXMLFile stringByDeletingPathExtension];
-		NSString * extension = [aXMLFile pathExtension];
-		
-        NSData * data;
-        NSString * bundlePath = [[NSBundle mainBundle] pathForResource:filename ofType:extension];
-        
-        if (!bundlePath) {
-            *error = [NSError errorWithDomain:D_TBXML_DOMAIN 
-                                         code:D_TBXML_FILE_NOT_FOUND_IN_BUNDLE 
-                                     userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithString:D_TBXML_FILE_NOT_FOUND_IN_BUNDLE_TEXT], NSLocalizedDescriptionKey, 
-                                                                                         [filename stringByAppendingPathExtension:extension], NSFilePathErrorKey, nil]];
-        } else {
-            // Get uncompressed file contents if TBXML+Compression has been included
-            if ([[NSData class] respondsToSelector:@selector(dataWithUncompressedContentsOfFile:)]) {
-                data = [[NSData class] performSelector:@selector(dataWithUncompressedContentsOfFile:) withObject:bundlePath];
-            } else {
-                data = [NSData dataWithContentsOfFile:bundlePath];
-            }
-            
-            
-            // decode data
-            *error = [self decodeData:data];            
         }
 	}
 	return self;
@@ -224,9 +215,7 @@
     if (self.rootXMLElement) {
         return nil;
     } else {
-        return [NSError errorWithDomain:D_TBXML_DOMAIN 
-                                   code:D_TBXML_ROOT_NOT_FOUND 
-                               userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithString:D_TBXML_ROOT_NOT_FOUND_TEXT], NSLocalizedDescriptionKey, nil]];
+        return [TBXML errorWithCode:D_TBXML_ROOT_NOT_FOUND];
     }
 }
 
@@ -247,18 +236,83 @@
 	return [NSString stringWithCString:&aXMLElement->name[0] encoding:NSUTF8StringEncoding];
 }
 
++ (NSString*) elementName:(TBXMLElement*)aXMLElement error:(NSError **)error {
+    // check for nil element
+    if (nil == aXMLElement) {
+        *error = [TBXML errorWithCode:D_TBXML_ELEMENT_IS_NIL];
+        return @"";
+    }
+    
+    // check for nil element name
+    if (nil == aXMLElement->name) {
+        *error = [TBXML errorWithCode:D_TBXML_ELEMENT_NAME_IS_NIL];
+        return @"";
+    }
+    
+	return [NSString stringWithCString:&aXMLElement->name[0] encoding:NSUTF8StringEncoding];
+}
+
 + (NSString*) attributeName:(TBXMLAttribute*)aXMLAttribute {
 	if (nil == aXMLAttribute->name) return @"";
 	return [NSString stringWithCString:&aXMLAttribute->name[0] encoding:NSUTF8StringEncoding];
 }
+
++ (NSString*) attributeName:(TBXMLAttribute*)aXMLAttribute error:(NSError **)error {
+    // check for nil attribute
+    if (nil == aXMLAttribute) {
+        *error = [TBXML errorWithCode:D_TBXML_ATTRIBUTE_IS_NIL];
+        return @"";
+    }
+    
+    // check for nil attribute name
+    if (nil == aXMLAttribute->name) {
+        *error = [TBXML errorWithCode:D_TBXML_ATTRIBUTE_NAME_IS_NIL];
+        return @"";
+    }
+    
+	return [NSString stringWithCString:&aXMLAttribute->name[0] encoding:NSUTF8StringEncoding];
+}
+
 
 + (NSString*) attributeValue:(TBXMLAttribute*)aXMLAttribute {
 	if (nil == aXMLAttribute->value) return @"";
 	return [NSString stringWithCString:&aXMLAttribute->value[0] encoding:NSUTF8StringEncoding];
 }
 
++ (NSString*) attributeValue:(TBXMLAttribute*)aXMLAttribute error:(NSError **)error {
+    // check for nil attribute
+    if (nil == aXMLAttribute) {
+        *error = [TBXML errorWithCode:D_TBXML_ATTRIBUTE_IS_NIL];
+        return @"";
+    }
+    
+    // check for nil attribute value
+    if (nil == aXMLAttribute->value) {
+        *error = [TBXML errorWithCode:D_TBXML_ATTRIBUTE_VALUE_IS_NIL];
+        return @"";
+    }
+    
+	return [NSString stringWithCString:&aXMLAttribute->value[0] encoding:NSUTF8StringEncoding];
+}
+
 + (NSString*) textForElement:(TBXMLElement*)aXMLElement {
 	if (nil == aXMLElement->text) return @"";
+	return [NSString stringWithCString:&aXMLElement->text[0] encoding:NSUTF8StringEncoding];
+}
+
++ (NSString*) textForElement:(TBXMLElement*)aXMLElement error:(NSError **)error {
+    // check for nil element
+    if (nil == aXMLElement) {
+        *error = [TBXML errorWithCode:D_TBXML_ELEMENT_IS_NIL];
+        return @"";
+    }
+    
+    // check for nil text value
+    if (nil == aXMLElement->text) {
+        *error = [TBXML errorWithCode:D_TBXML_ELEMENT_TEXT_IS_NIL];
+        return @"";
+    }
+    
 	return [NSString stringWithCString:&aXMLElement->text[0] encoding:NSUTF8StringEncoding];
 }
 
@@ -276,7 +330,52 @@
 	return value;
 }
 
++ (NSString*) valueOfAttributeNamed:(NSString *)aName forElement:(TBXMLElement*)aXMLElement error:(NSError **)error {
+    // check for nil element
+    if (nil == aXMLElement) {
+        *error = [TBXML errorWithCode:D_TBXML_ELEMENT_IS_NIL];
+        return @"";
+    }
+    
+    // check for nil name parameter
+    if (nil == aXMLElement) {
+        *error = [TBXML errorWithCode:D_TBXML_PARAM_NAME_IS_NIL];
+        return @"";
+    }
+    
+    BOOL attributeFound = NO;
+	const char * name = [aName cStringUsingEncoding:NSUTF8StringEncoding];
+	NSString * value = nil;
+    
+	TBXMLAttribute * attribute = aXMLElement->firstAttribute;
+	while (attribute) {
+		if (strlen(attribute->name) == strlen(name) && memcmp(attribute->name,name,strlen(name)) == 0) {
+            attributeFound = YES;
+            if (attribute->value[0])
+                value = [NSString stringWithCString:&attribute->value[0] encoding:NSUTF8StringEncoding];
+			break;
+		}
+		attribute = attribute->next;
+	}
+    
+    // check for attribute not found
+    if (!attributeFound) {
+        *error = [TBXML errorWithCode:D_TBXML_ATTRIBUTE_NOT_FOUND];
+        return @"";
+    }
+    
+    // check for nil attribute value
+    if (!value) {
+        *error = [TBXML errorWithCode:D_TBXML_ATTRIBUTE_VALUE_IS_NIL];
+        return @"";
+    }
+    
+    
+	return value;
+}
+
 + (TBXMLElement*) childElementNamed:(NSString*)aName parentElement:(TBXMLElement*)aParentXMLElement{
+    
 	TBXMLElement * xmlElement = aParentXMLElement->firstChild;
 	const char * name = [aName cStringUsingEncoding:NSUTF8StringEncoding];
 	while (xmlElement) {
@@ -285,6 +384,33 @@
 		}
 		xmlElement = xmlElement->nextSibling;
 	}
+	return nil;
+}
+
++ (TBXMLElement*) childElementNamed:(NSString*)aName parentElement:(TBXMLElement*)aParentXMLElement error:(NSError **)error {
+    // check for nil element
+    if (nil == aParentXMLElement) {
+        *error = [TBXML errorWithCode:D_TBXML_ELEMENT_IS_NIL];
+        return nil;
+    }
+    
+    // check for nil name parameter
+    if (nil == aName) {
+        *error = [TBXML errorWithCode:D_TBXML_PARAM_NAME_IS_NIL];
+        return nil;
+    }
+    
+	TBXMLElement * xmlElement = aParentXMLElement->firstChild;
+	const char * name = [aName cStringUsingEncoding:NSUTF8StringEncoding];
+	while (xmlElement) {
+		if (strlen(xmlElement->name) == strlen(name) && memcmp(xmlElement->name,name,strlen(name)) == 0) {
+			return xmlElement;
+		}
+		xmlElement = xmlElement->nextSibling;
+	}
+    
+    *error = [TBXML errorWithCode:D_TBXML_ELEMENT_NOT_FOUND];
+    
 	return nil;
 }
 
@@ -300,6 +426,77 @@
 	return nil;
 }
 
++ (TBXMLElement*) nextSiblingNamed:(NSString*)aName searchFromElement:(TBXMLElement*)aXMLElement error:(NSError **)error {
+    // check for nil element
+    if (nil == aXMLElement) {
+        *error = [TBXML errorWithCode:D_TBXML_ELEMENT_IS_NIL];
+        return nil;
+    }
+    
+    // check for nil name parameter
+    if (nil == aName) {
+        *error = [TBXML errorWithCode:D_TBXML_PARAM_NAME_IS_NIL];
+        return nil;
+    }
+    
+	TBXMLElement * xmlElement = aXMLElement->nextSibling;
+	const char * name = [aName cStringUsingEncoding:NSUTF8StringEncoding];
+	while (xmlElement) {
+		if (strlen(xmlElement->name) == strlen(name) && memcmp(xmlElement->name,name,strlen(name)) == 0) {
+			return xmlElement;
+		}
+		xmlElement = xmlElement->nextSibling;
+	}
+    
+    *error = [TBXML errorWithCode:D_TBXML_ELEMENT_NOT_FOUND];
+    
+	return nil;
+}
+
++ (void)iterateElementsForQuery:(NSString *)query fromElement:(TBXMLElement *)anElement withBlock:(TBXMLIterateBlock)iterateBlock {
+    
+    NSArray *components = [query componentsSeparatedByString:@"."];
+    TBXMLElement *currTBXMLElement = anElement;
+    
+    // navigate down
+    for (NSInteger i=0; i < components.count; ++i) {
+        NSString *iTagName = [components objectAtIndex:i];
+        
+        if ([iTagName isEqualToString:@"*"]) {
+            currTBXMLElement = currTBXMLElement->firstChild;
+            
+            // different behavior depending on if this is the end of the query or midstream
+            if (i < (components.count - 1)) {
+                // midstream
+                do {
+                    NSString *restOfQuery = [[components subarrayWithRange:NSMakeRange(i + 1, components.count - i - 1)] componentsJoinedByString:@"."];
+                    [TBXML iterateElementsForQuery:restOfQuery fromElement:currTBXMLElement withBlock:iterateBlock];
+                } while ((currTBXMLElement = currTBXMLElement->nextSibling));
+                
+            }
+        } else {
+            currTBXMLElement = [TBXML childElementNamed:iTagName parentElement:currTBXMLElement];            
+        }
+        
+        if (!currTBXMLElement) {
+            break;
+        }
+    }
+    
+    if (currTBXMLElement) {
+        // enumerate
+        NSString *childTagName = [components lastObject];
+        
+        if ([childTagName isEqualToString:@"*"]) {
+            childTagName = nil;
+        }
+        
+        do {
+            iterateBlock(currTBXMLElement);
+        } while ((currTBXMLElement = currTBXMLElement->nextSibling));
+    }
+}
+
 @end
 
 
@@ -312,21 +509,62 @@
 
 @implementation TBXML (Private)
 
++ (NSString *) errorTextForCode:(int)code {
+    NSString * codeText = @"";
+    
+    switch (code) {
+        case D_TBXML_DATA_NIL:                  codeText = @"Data is nil";                          break;
+        case D_TBXML_DECODE_FAILURE:            codeText = @"Decode failure";                       break;
+        case D_TBXML_MEMORY_ALLOC_FAILURE:      codeText = @"Unable to allocate memory";            break;
+        case D_TBXML_ROOT_NOT_FOUND:            codeText = @"Document root not found";              break;
+        case D_TBXML_FILE_NOT_FOUND_IN_BUNDLE:  codeText = @"File not found in bundle";             break;
+            
+        case D_TBXML_ELEMENT_IS_NIL:            codeText = @"Element is nil";                       break;
+        case D_TBXML_ELEMENT_NAME_IS_NIL:       codeText = @"Element name is nil";                  break;
+        case D_TBXML_ATTRIBUTE_IS_NIL:          codeText = @"Attribute is nil";                     break;
+        case D_TBXML_ATTRIBUTE_NAME_IS_NIL:     codeText = @"Attribute name is nil";                break;
+        case D_TBXML_ATTRIBUTE_VALUE_IS_NIL:    codeText = @"Attribute value is nil";               break;
+        case D_TBXML_ELEMENT_TEXT_IS_NIL:       codeText = @"Element text is nil";                  break;
+        case D_TBXML_PARAM_NAME_IS_NIL:         codeText = @"Parameter name is nil";                break;
+        case D_TBXML_ATTRIBUTE_NOT_FOUND:       codeText = @"Attribute not found";                  break;
+        case D_TBXML_ELEMENT_NOT_FOUND:         codeText = @"Element not found";                    break;
+            
+        default: codeText = @"No Error Description!"; break;
+    }
+    
+    return codeText;
+}
+
++ (NSError *) errorWithCode:(int)code {
+    
+    NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[TBXML errorTextForCode:code], NSLocalizedDescriptionKey, nil];
+    
+    return [NSError errorWithDomain:D_TBXML_DOMAIN 
+                               code:code 
+                           userInfo:userInfo];
+}
+
++ (NSError *) errorWithCode:(int)code userInfo:(NSMutableDictionary *)someUserInfo {
+    
+    NSMutableDictionary *userInfo = [NSMutableDictionary dictionaryWithDictionary:someUserInfo];
+    [userInfo setValue:[TBXML errorTextForCode:code] forKey:NSLocalizedDescriptionKey];
+    
+    return [NSError errorWithDomain:D_TBXML_DOMAIN 
+                               code:code 
+                           userInfo:userInfo];
+}
+
 - (void) allocateBytesOfLength:(long)length error:(NSError **)error {
     bytesLength = length;
     
     if(!length) {
-        *error = [NSError errorWithDomain:D_TBXML_DOMAIN 
-                                     code:D_TBXML_DATA_NIL
-                                 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithString:D_TBXML_DATA_NIL_TEXT], NSLocalizedDescriptionKey, nil]];
+        *error = [TBXML errorWithCode:D_TBXML_DATA_NIL];
     }
     
 	bytes = malloc(bytesLength+1);
     
     if(!bytes) {
-        *error = [NSError errorWithDomain:D_TBXML_DOMAIN 
-                                     code:D_TBXML_MEMORY_ALLOC_FAILURE
-                                 userInfo:[NSDictionary dictionaryWithObjectsAndKeys:[NSString stringWithString:D_TBXML_MEMORY_ALLOC_FAILURE_TEXT], NSLocalizedDescriptionKey, nil]];
+        *error = [TBXML errorWithCode:D_TBXML_MEMORY_ALLOC_FAILURE];
     }
 }
 

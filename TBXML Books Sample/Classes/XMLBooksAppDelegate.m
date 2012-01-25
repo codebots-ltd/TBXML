@@ -51,6 +51,9 @@
 	// Load the books xml file into a class structure for displaying through tableviews.
 	[self loadBooks];
 	
+    // Load the books xml file and use the block iteration method to query the XML
+	[self iterateBooks];
+	
     // Override point for customization after app launch    
     [window addSubview:viewController.view];
     [window makeKeyAndVisible];
@@ -117,6 +120,39 @@
         // If TBXML found a root node, process element and iterate all children
         if (tbxml.rootXMLElement)
             [self traverseElement:tbxml.rootXMLElement];
+    }
+}
+
+- (void)iterateBooks {
+    
+    // error var
+    __block NSError *error = nil;
+    
+	// Load and parse the books.xml file
+	tbxml = [TBXML tbxmlWithXMLFile:@"books.xml" error:&error];
+    
+    // if an error occured, log it    
+    if (error) { 
+        NSLog(@"Error! %@ %@", [error localizedDescription], [error userInfo]);
+        
+    } else {
+        
+        // iterate all child elements of tbxml.rootXMLElement that are named "author"
+        [TBXML iterateElementsForQuery:@"author" fromElement:tbxml.rootXMLElement withBlock:^(TBXMLElement *anElement) {
+
+            // get the name of the current element
+            NSString * name = [TBXML elementName:anElement error:&error];
+
+            // if an error occured, log it    
+            if (error) {
+                NSLog(@"Error! %@ %@", [error localizedDescription], [error userInfo]);
+            } else {
+                // log the element name and "name" attribute
+                NSLog(@"Author Name:%@", name);
+                NSLog(@"Author Name:%@", [TBXML valueOfAttributeNamed:@"name" forElement:anElement]);
+            }
+        }];
+        
     }
 }
 
