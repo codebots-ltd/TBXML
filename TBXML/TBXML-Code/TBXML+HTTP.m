@@ -59,7 +59,6 @@
 			} else {
 				successBlock(data,response);
 			}
-		
 		}		
 	});
 }
@@ -79,7 +78,8 @@
         
         TBXMLAsyncRequestSuccessBlock requestSuccessBlock = ^(NSData *data, NSURLResponse *response) {
 
-            NSError *error = [self decodeData:data];
+            NSError *error = nil;
+            [self decodeData:data withError:&error];
             
             // If TBXML found a root node, process element and iterate all children
             if (!error) {

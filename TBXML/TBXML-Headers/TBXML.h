@@ -6,7 +6,7 @@
 //  Created by Tom Bradley on 21/10/2009.
 //  Version 1.5
 //  
-//  Copyright 2012 71Squared All rights reserved.
+//  Copyright 2012 71Squared All rights reserved.b
 //  
 //  Permission is hereby granted, free of charge, to any person obtaining a copy
 //  of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,6 @@ enum TBXMLErrorCodes {
     D_TBXML_DATA_NIL,
     D_TBXML_DECODE_FAILURE,
     D_TBXML_MEMORY_ALLOC_FAILURE,
-    D_TBXML_ROOT_NOT_FOUND,
     D_TBXML_FILE_NOT_FOUND_IN_BUNDLE,
     
     D_TBXML_ELEMENT_IS_NIL,
@@ -46,7 +45,6 @@ enum TBXMLErrorCodes {
     D_TBXML_ELEMENT_TEXT_IS_NIL,
     D_TBXML_ATTRIBUTE_IS_NIL,
     D_TBXML_ATTRIBUTE_NAME_IS_NIL,
-    D_TBXML_ATTRIBUTE_VALUE_IS_NIL,
     D_TBXML_ATTRIBUTE_NOT_FOUND,
     D_TBXML_PARAM_NAME_IS_NIL
 };
@@ -169,7 +167,8 @@ typedef void (^TBXMLIterateBlock)(TBXMLElement *);
 - (id)initWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension __attribute__((deprecated));
 
 
-- (NSError *) decodeData:(NSData*)data;
+- (void) decodeData:(NSData*)data;
+- (void) decodeData:(NSData*)data withError:(NSError **)error;
 
 @end
 
@@ -182,15 +181,20 @@ typedef void (^TBXMLIterateBlock)(TBXMLElement *);
 + (NSString*) elementName:(TBXMLElement*)aXMLElement;
 + (NSString*) elementName:(TBXMLElement*)aXMLElement error:(NSError **)error;
 + (NSString*) textForElement:(TBXMLElement*)aXMLElement;
++ (NSString*) textForElement:(TBXMLElement*)aXMLElement error:(NSError **)error;
 + (NSString*) valueOfAttributeNamed:(NSString *)aName forElement:(TBXMLElement*)aXMLElement;
++ (NSString*) valueOfAttributeNamed:(NSString *)aName forElement:(TBXMLElement*)aXMLElement error:(NSError **)error;
 
 + (NSString*) attributeName:(TBXMLAttribute*)aXMLAttribute;
 + (NSString*) attributeName:(TBXMLAttribute*)aXMLAttribute error:(NSError **)error;
 + (NSString*) attributeValue:(TBXMLAttribute*)aXMLAttribute;
++ (NSString*) attributeValue:(TBXMLAttribute*)aXMLAttribute error:(NSError **)error;
 
 + (TBXMLElement*) nextSiblingNamed:(NSString*)aName searchFromElement:(TBXMLElement*)aXMLElement;
 + (TBXMLElement*) childElementNamed:(NSString*)aName parentElement:(TBXMLElement*)aParentXMLElement;
 
++ (TBXMLElement*) nextSiblingNamed:(NSString*)aName searchFromElement:(TBXMLElement*)aXMLElement error:(NSError **)error;
++ (TBXMLElement*) childElementNamed:(NSString*)aName parentElement:(TBXMLElement*)aParentXMLElement error:(NSError **)error;
 
 /** Iterate through all elements found using query.
  

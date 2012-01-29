@@ -109,7 +109,7 @@
         [self allocateBytesOfLength:[aXMLString lengthOfBytesUsingEncoding:NSUTF8StringEncoding] error:error];
         
         // if an error occured, return
-        if (*error != nil) 
+        if (error && *error != nil) 
             return self;
         
 		// copy string to byte array
@@ -120,6 +120,11 @@
 		
 		// decode xml data
 		[self decodeBytes];
+        
+        // Check for root element
+        if (error && !*error && !self.rootXMLElement) {
+            *error = [TBXML errorWithCode:D_TBXML_DECODE_FAILURE];
+        }
 	}
 	return self;
 }
@@ -132,7 +137,7 @@
     self = [self init];
     if (self != nil) {
 		// decode aData
-		*error = [self decodeData:aData];
+		[self decodeData:aData withError:error];
     }
     
     return self;
@@ -162,14 +167,15 @@
 	if (self != nil) {
         
         NSData * data;
-        NSString * bundlePath = [[NSBundle mainBundle] pathForResource:aXMLFile ofType:aFileExtension];
         
-        if (!bundlePath) {
-            
-            NSDictionary * userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[aXMLFile stringByAppendingPathExtension:aFileExtension], NSFilePathErrorKey, nil];
-            
-            *error = [TBXML errorWithCode:D_TBXML_FILE_NOT_FOUND_IN_BUNDLE userInfo:userInfo];
+        // Get the bundle that this class resides in. This allows to load resources from the app bundle when running unit tests.
+        NSString * bundlePath = [[NSBundle bundleForClass:[self class]] pathForResource:aXMLFile ofType:aFileExtension];
 
+        if (!bundlePath) {
+            if (error) {
+                NSDictionary * userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[aXMLFile stringByAppendingPathExtension:aFileExtension], NSFilePathErrorKey, nil];
+                *error = [TBXML errorWithCode:D_TBXML_FILE_NOT_FOUND_IN_BUNDLE userInfo:userInfo];
+            }
         } else {
             SEL dataWithUncompressedContentsOfFile = @selector(dataWithUncompressedContentsOfFile:);
             
@@ -186,22 +192,29 @@
             }
             
             // decode data
-            *error = [self decodeData:data];
+            [self decodeData:data withError:error];
+            
+            // Check for root element
+            if (error && !*error && !self.rootXMLElement) {
+                *error = [TBXML errorWithCode:D_TBXML_DECODE_FAILURE];
+            }
         }
 	}
 	return self;
 }
 
-- (NSError *)decodeData:(NSData*)data {
-	
-    NSError *error = nil;
+- (void) decodeData:(NSData*)data {
+    [self decodeData:data withError:nil];
+}
+
+- (void) decodeData:(NSData*)data withError:(NSError **)error {
     
     // allocate memory for byte array
-    [self allocateBytesOfLength:[data length] error:&error];
+    [self allocateBytesOfLength:[data length] error:error];
 
     // if an error occured, return
-    if (error) 
-        return error;
+    if (error && *error)
+        return;
     
     // copy data to byte array
     [data getBytes:bytes length:bytesLength];
@@ -212,10 +225,8 @@
 	// decode xml data
 	[self decodeBytes];
     
-    if (self.rootXMLElement) {
-        return nil;
-    } else {
-        return [TBXML errorWithCode:D_TBXML_ROOT_NOT_FOUND];
+    if (!self.rootXMLElement) {
+        *error = [TBXML errorWithCode:D_TBXML_DECODE_FAILURE];
     }
 }
 
@@ -244,7 +255,7 @@
     }
     
     // check for nil element name
-    if (nil == aXMLElement->name) {
+    if (nil == aXMLElement->name || strlen(aXMLElement->name) == 0) {
         *error = [TBXML errorWithCode:D_TBXML_ELEMENT_NAME_IS_NIL];
         return @"";
     }
@@ -286,12 +297,6 @@
         return @"";
     }
     
-    // check for nil attribute value
-    if (nil == aXMLAttribute->value) {
-        *error = [TBXML errorWithCode:D_TBXML_ATTRIBUTE_VALUE_IS_NIL];
-        return @"";
-    }
-    
 	return [NSString stringWithCString:&aXMLAttribute->value[0] encoding:NSUTF8StringEncoding];
 }
 
@@ -308,7 +313,7 @@
     }
     
     // check for nil text value
-    if (nil == aXMLElement->text) {
+    if (nil == aXMLElement->text || strlen(aXMLElement->text) == 0) {
         *error = [TBXML errorWithCode:D_TBXML_ELEMENT_TEXT_IS_NIL];
         return @"";
     }
@@ -338,19 +343,17 @@
     }
     
     // check for nil name parameter
-    if (nil == aXMLElement) {
-        *error = [TBXML errorWithCode:D_TBXML_PARAM_NAME_IS_NIL];
+    if (nil == aName) {
+        *error = [TBXML errorWithCode:D_TBXML_ATTRIBUTE_NAME_IS_NIL];
         return @"";
     }
     
-    BOOL attributeFound = NO;
 	const char * name = [aName cStringUsingEncoding:NSUTF8StringEncoding];
 	NSString * value = nil;
     
 	TBXMLAttribute * attribute = aXMLElement->firstAttribute;
 	while (attribute) {
 		if (strlen(attribute->name) == strlen(name) && memcmp(attribute->name,name,strlen(name)) == 0) {
-            attributeFound = YES;
             if (attribute->value[0])
                 value = [NSString stringWithCString:&attribute->value[0] encoding:NSUTF8StringEncoding];
 			break;
@@ -359,17 +362,10 @@
 	}
     
     // check for attribute not found
-    if (!attributeFound) {
+    if (!value) {
         *error = [TBXML errorWithCode:D_TBXML_ATTRIBUTE_NOT_FOUND];
         return @"";
     }
-    
-    // check for nil attribute value
-    if (!value) {
-        *error = [TBXML errorWithCode:D_TBXML_ATTRIBUTE_VALUE_IS_NIL];
-        return @"";
-    }
-    
     
 	return value;
 }
@@ -516,14 +512,12 @@
         case D_TBXML_DATA_NIL:                  codeText = @"Data is nil";                          break;
         case D_TBXML_DECODE_FAILURE:            codeText = @"Decode failure";                       break;
         case D_TBXML_MEMORY_ALLOC_FAILURE:      codeText = @"Unable to allocate memory";            break;
-        case D_TBXML_ROOT_NOT_FOUND:            codeText = @"Document root not found";              break;
         case D_TBXML_FILE_NOT_FOUND_IN_BUNDLE:  codeText = @"File not found in bundle";             break;
             
         case D_TBXML_ELEMENT_IS_NIL:            codeText = @"Element is nil";                       break;
         case D_TBXML_ELEMENT_NAME_IS_NIL:       codeText = @"Element name is nil";                  break;
         case D_TBXML_ATTRIBUTE_IS_NIL:          codeText = @"Attribute is nil";                     break;
         case D_TBXML_ATTRIBUTE_NAME_IS_NIL:     codeText = @"Attribute name is nil";                break;
-        case D_TBXML_ATTRIBUTE_VALUE_IS_NIL:    codeText = @"Attribute value is nil";               break;
         case D_TBXML_ELEMENT_TEXT_IS_NIL:       codeText = @"Element text is nil";                  break;
         case D_TBXML_PARAM_NAME_IS_NIL:         codeText = @"Parameter name is nil";                break;
         case D_TBXML_ATTRIBUTE_NOT_FOUND:       codeText = @"Attribute not found";                  break;
@@ -568,7 +562,7 @@
     }
 }
 
-- (void) decodeBytes{
+- (void) decodeBytes {
 	
 	// -----------------------------------------------------------------------------
 	// Process xml
@@ -642,6 +636,7 @@
 			}
 		}
 		
+        if (!elementEnd) break;
 		
 		// null terminate element end
 		if (elementEnd) *elementEnd = 0;

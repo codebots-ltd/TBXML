@@ -1,0 +1,32 @@
+<?xml version="1.0"?>
+<authors>
+	<author name="J.K. Rowling">
+		<book title="Harry Potter and the Philosopher's Stone" price="119.99">
+			<description>
+				Harry potter thinks he is an ordinary boy - until he is rescued from a beetle-eyed giant of a man, enrolls at Hogwarts School of Witchcraft and Wizardry, learns to play quidditch and does battle in a deadly duel.
+			</description>
+		</book>
+		<book title="Harry Potter and the Chamber of Secrets" price="8.99">
+			<description>
+				When the Chamber of Secrets is opened again at the Hogwarts School for Witchcraft and Wizardry, second-year student Harry Potter finds himself in danger from a dark power that has once more been released on the school.
+			</description>
+		</book>
+		<book title="Harry Potter and the Prisoner of Azkaban" price="12.99">
+			<description>
+				Harry Potter, along with his friends, Ron and Hermione, is about to start his third year at Hogwarts School of Witchcraft and Wizardry. Harry can't wait to get back to school after the summer holidays. (Who wouldn't if they lived with the horrible Dursleys?) But when Harry gets to Hogwarts, the atmosphere is tense. There's an escaped mass murderer on the the loose, and the sinister prison guards of Azkaban have been called in to guard the school.
+			</description>
+		</book>
+	</author>
+	<author name="Douglas Adams">
+		<book title="The Hitchhiker's Guide to the Galaxy" price="15.49">
+			<description>
+				Join Douglas Adams's hapless hero Arthur Dent as he travels the galaxy with his intrepid pal Ford Prefect, getting into horrible messes and generally wreaking hilarious havoc.
+			</description>
+		</book>
+		<book title="The Restaurant at the End of the Universe " price="14.36">
+			<description>
+				Arthur and Ford, having survived the destruction of Earth by surreptitiously hitching a ride on a Vogon constructor ship, have been kicked off that ship by its commander. Now they find themselves aboard a stolen Improbability Drive ship commanded by Beeblebrox, ex-president of the Imperial Galactic Government and full-time thief.
+			</description>
+		</book>
+	</author>
+</authors>
