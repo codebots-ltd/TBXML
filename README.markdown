@@ -15,6 +15,8 @@ TBXML is incredibly fast! Check out this post for a good comparison of XML parse
 
 ### What Now?
 
+Have a play with the [TBXML-Books](https://github.com/71squared/TBXML-Books) sample project
+
 View the "TBXML" wiki page to get find out how TBXML works. It contains many examples showing you how to use TBXML to parse your XML files. There are 2 complementary additions to extend the functionality of TBXML. These add the ability to automatically decompress files and perform asynchronous HTTP requests.
 
 [TBXML](https://github.com/71squared/TBXML/wiki/TBXML)   
