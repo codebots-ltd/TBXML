@@ -30,9 +30,6 @@
 		829FA0D014D5B55D00D18697 /* TBXML+Compression.m in Sources */ = {isa = PBXBuildFile; fileRef = 829FA0C914D5B55D00D18697 /* TBXML+Compression.m */; };
 		829FA0D114D5B55D00D18697 /* TBXML+HTTP.m in Sources */ = {isa = PBXBuildFile; fileRef = 829FA0CA14D5B55D00D18697 /* TBXML+HTTP.m */; };
 		829FA0D214D5B55D00D18697 /* TBXML.m in Sources */ = {isa = PBXBuildFile; fileRef = 829FA0CB14D5B55D00D18697 /* TBXML.m */; };
-		829FA0D314D5B55D00D18697 /* TBXML+Compression.h in Headers */ = {isa = PBXBuildFile; fileRef = 829FA0CD14D5B55D00D18697 /* TBXML+Compression.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		829FA0D414D5B55D00D18697 /* TBXML+HTTP.h in Headers */ = {isa = PBXBuildFile; fileRef = 829FA0CE14D5B55D00D18697 /* TBXML+HTTP.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		829FA0D514D5B55D00D18697 /* TBXML.h in Headers */ = {isa = PBXBuildFile; fileRef = 829FA0CF14D5B55D00D18697 /* TBXML.h */; settings = {ATTRIBUTES = (Public, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -228,9 +225,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				829FA0D514D5B55D00D18697 /* TBXML.h in Headers */,
-				829FA0D414D5B55D00D18697 /* TBXML+HTTP.h in Headers */,
-				829FA0D314D5B55D00D18697 /* TBXML+Compression.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -608,6 +602,7 @@
 				8290354514D9F5B200ACF7E4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		8290354914D9F5B200ACF7E4 /* Build configuration list for PBXNativeTarget "TBXML-iOSTests" */ = {
 			isa = XCConfigurationList;
@@ -616,6 +611,7 @@
 				8290354714D9F5B200ACF7E4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		829FA09614D5B52A00D18697 /* Build configuration list for PBXProject "TBXML" */ = {
 			isa = XCConfigurationList;
