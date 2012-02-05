@@ -177,7 +177,7 @@
                 *error = [TBXML errorWithCode:D_TBXML_FILE_NOT_FOUND_IN_BUNDLE userInfo:userInfo];
             }
         } else {
-            SEL dataWithUncompressedContentsOfFile = @selector(dataWithUncompressedContentsOfFile:);
+            SEL dataWithUncompressedContentsOfFile = NSSelectorFromString(@"dataWithUncompressedContentsOfFile:");
             
             // Get uncompressed file contents if TBXML+Compression has been included
             if ([[NSData class] respondsToSelector:dataWithUncompressedContentsOfFile]) {
