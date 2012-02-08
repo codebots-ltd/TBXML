@@ -493,6 +493,22 @@
     }
 }
 
++ (void)iterateAttributesOfElement:(TBXMLElement *)anElement withBlock:(TBXMLIterateAttributeBlock)iterateAttributeBlock {
+
+    // Obtain first attribute from element
+    TBXMLAttribute * attribute = anElement->firstAttribute;
+    
+    // if attribute is valid
+    
+    while (attribute) {
+        // Call the iterateAttributeBlock with the attribute, it's name and value
+        iterateAttributeBlock(attribute, [TBXML attributeName:attribute], [TBXML attributeValue:attribute]);
+        
+        // Obtain the next attribute
+        attribute = attribute->next;
+    }
+}
+
 @end
 
 

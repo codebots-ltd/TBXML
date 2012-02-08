@@ -121,6 +121,7 @@ typedef struct _TBXMLAttributeBuffer {
 typedef void (^TBXMLSuccessBlock)(TBXML *);
 typedef void (^TBXMLFailureBlock)(TBXML *, NSError *);
 typedef void (^TBXMLIterateBlock)(TBXMLElement *);
+typedef void (^TBXMLIterateAttributeBlock)(TBXMLAttribute *, NSString*, NSString*);
 
 
 // ================================================================================================
@@ -201,5 +202,7 @@ typedef void (^TBXMLIterateBlock)(TBXMLElement *);
  Inspiration taken from John Blanco's RaptureXML https://github.com/ZaBlanc/RaptureXML
  */
 + (void)iterateElementsForQuery:(NSString *)query fromElement:(TBXMLElement *)anElement withBlock:(TBXMLIterateBlock)iterateBlock;
++ (void)iterateAttributesOfElement:(TBXMLElement *)anElement withBlock:(TBXMLIterateAttributeBlock)iterateBlock;
+
 
 @end
