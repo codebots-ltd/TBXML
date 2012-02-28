@@ -356,6 +356,9 @@
 		if (strlen(attribute->name) == strlen(name) && memcmp(attribute->name,name,strlen(name)) == 0) {
             if (attribute->value[0])
                 value = [NSString stringWithCString:&attribute->value[0] encoding:NSUTF8StringEncoding];
+            else
+                value = [NSString stringWithString:@""];
+            
 			break;
 		}
 		attribute = attribute->next;

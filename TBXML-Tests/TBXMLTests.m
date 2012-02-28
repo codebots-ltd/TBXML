@@ -221,5 +221,53 @@
     STAssertTrue([text isEqualToString:@"Element Text"], @"Incorrect Element Text %@", text);
 }
 
+- (void)testRootNodeAttributeEmpty
+{   
+    NSString *string = @"<?xml version=\"1.0\"?><RESPONSE MSG=\"\"/>";
+    
+    NSError *error;
+    TBXML * tbxml = [TBXML tbxmlWithXMLString:string error:nil];
+    STAssertTrue(tbxml.rootXMLElement != nil, @"Root element is nil");
+    
+    NSString * value = [TBXML valueOfAttributeNamed:@"MSG" forElement:tbxml.rootXMLElement error:&error];
+    STAssertNil(error, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
+    STAssertTrue([value isEqualToString:@""], @"Returned string is not empty");
+}
 
 @end
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
