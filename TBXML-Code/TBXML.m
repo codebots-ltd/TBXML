@@ -492,7 +492,7 @@
         
         do {
             iterateBlock(currTBXMLElement);
-        } while ((currTBXMLElement = currTBXMLElement->nextSibling));
+        } while (childTagName ? (currTBXMLElement = [TBXML nextSiblingNamed:childTagName searchFromElement:currTBXMLElement]) : (currTBXMLElement = currTBXMLElement->nextSibling));
     }
 }
 
