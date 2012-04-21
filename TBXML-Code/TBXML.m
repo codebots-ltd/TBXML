@@ -892,6 +892,7 @@
 		}
 	}
 	
+    [super dealloc];
 }
 
 - (TBXMLElement*) nextAvailableElement {
