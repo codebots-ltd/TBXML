@@ -97,7 +97,8 @@
 	return self;
 }
 - (id)initWithXMLString:(NSString*)aXMLString {
-    return [self initWithXMLString:aXMLString error:nil];
+    NSError *error = nil;
+    return [self initWithXMLString:aXMLString error:&error];
 }
 
 - (id)initWithXMLString:(NSString*)aXMLString error:(NSError *__autoreleasing *)error {
@@ -130,7 +131,8 @@
 }
 
 - (id)initWithXMLData:(NSData*)aData {
-    return [self initWithXMLData:aData error:nil];
+    NSError *error = nil;
+    return [self initWithXMLData:aData error:&error];
 }
 
 - (id)initWithXMLData:(NSData*)aData error:(NSError **)error {
@@ -144,7 +146,8 @@
 }
 
 - (id)initWithXMLFile:(NSString*)aXMLFile {
-    return [self initWithXMLFile:aXMLFile error:nil];
+    NSError *error = nil;
+    return [self initWithXMLFile:aXMLFile error:&error];
 }
 
 - (id)initWithXMLFile:(NSString*)aXMLFile error:(NSError **)error {
@@ -159,7 +162,8 @@
 }
 
 - (id)initWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension {
-    return [self initWithXMLFile:aXMLFile fileExtension:aFileExtension error:nil];
+    NSError *error = nil;
+    return [self initWithXMLFile:aXMLFile fileExtension:aFileExtension error:&error];
 }
 
 - (id)initWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension error:(NSError **)error {
@@ -204,7 +208,8 @@
 }
 
 - (void) decodeData:(NSData*)data {
-    [self decodeData:data withError:nil];
+    NSError *error = nil;
+    [self decodeData:data withError:&error];
 }
 
 - (void) decodeData:(NSData*)data withError:(NSError **)error {
