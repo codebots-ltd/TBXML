@@ -27,7 +27,7 @@ typedef void (^TBXMLAsyncRequestFailureBlock)(NSData *,NSError *);
 
 @interface TBXML (TBXML_HTTP)
 
-+ (id)tbxmlWithURL:(NSURL*)aURL success:(TBXMLSuccessBlock)successBlock failure:(TBXMLFailureBlock)failureBlock;
++ (id)newTBXMLWithURL:(NSURL*)aURL success:(TBXMLSuccessBlock)successBlock failure:(TBXMLFailureBlock)failureBlock;
 - (id)initWithURL:(NSURL*)aURL success:(TBXMLSuccessBlock)successBlock failure:(TBXMLFailureBlock)failureBlock;
 
 @end

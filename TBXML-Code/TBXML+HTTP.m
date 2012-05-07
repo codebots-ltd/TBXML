@@ -16,7 +16,13 @@
 	[request setURL:url];
 	[request setHTTPMethod:@"GET"];
     
-	return request;
+    
+#ifndef ARC_ENABLED
+    return [request autorelease];
+#else
+    return request;
+#endif
+    
 }
 
 + (NSMutableURLRequest*) tbxmlPostRequestWithURL:(NSURL*)url parameters:(NSDictionary*)parameters {
@@ -37,7 +43,12 @@
 	[request setValue:postLength forHTTPHeaderField:@"Content-Length"];
 	[request setHTTPBody:postData];
 
-	return request;
+#ifndef ARC_ENABLED
+    [params release];
+    return [request autorelease];
+#else
+    return request;
+#endif
 }
 
 @end
@@ -68,7 +79,7 @@
 
 @implementation TBXML (TBXML_HTTP)
 
-+ (id)tbxmlWithURL:(NSURL*)aURL success:(TBXMLSuccessBlock)successBlock failure:(TBXMLFailureBlock)failureBlock {
++ (id)newTBXMLWithURL:(NSURL*)aURL success:(TBXMLSuccessBlock)successBlock failure:(TBXMLFailureBlock)failureBlock {
 	return [[TBXML alloc] initWithURL:aURL success:successBlock failure:failureBlock];
 }
 

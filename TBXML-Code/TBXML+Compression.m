@@ -70,9 +70,8 @@ static char encodingTable[64] = {
 	'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/' };
 
 
-+ (NSData *) dataWithBase64EncodedString:(NSString *) string {
-    NSData *result = [[NSData alloc] initWithBase64EncodedString:string];
-    return result;
++ (NSData *) newDataWithBase64EncodedString:(NSString *) string {
+    return [[NSData alloc] initWithBase64EncodedString:string];
 }
 
 - (id) initWithBase64EncodedString:(NSString *) string {
@@ -82,7 +81,7 @@ static char encodingTable[64] = {
         unsigned long ixtext = 0;
         unsigned long lentext = 0;
         unsigned char ch = 0;
-        unsigned char inbuf[4], outbuf[3];
+        unsigned char inbuf[4] = {0,0,0,0}, outbuf[3] = {0,0,0};
         short i = 0, ixinbuf = 0;
         BOOL flignore = NO;
         BOOL flendtext = NO;

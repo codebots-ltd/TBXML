@@ -34,6 +34,8 @@
 //  Error Codes
 // ================================================================================================
 enum TBXMLErrorCodes {
+    D_TBXML_SUCCESS = 0,
+
     D_TBXML_DATA_NIL,
     D_TBXML_DECODE_FAILURE,
     D_TBXML_MEMORY_ALLOC_FAILURE,
@@ -118,10 +120,10 @@ typedef struct _TBXMLAttributeBuffer {
 // ================================================================================================
 //  Block Callbacks
 // ================================================================================================
-typedef void (^TBXMLSuccessBlock)(TBXML *);
-typedef void (^TBXMLFailureBlock)(TBXML *, NSError *);
-typedef void (^TBXMLIterateBlock)(TBXMLElement *);
-typedef void (^TBXMLIterateAttributeBlock)(TBXMLAttribute *, NSString*, NSString*);
+typedef void (^TBXMLSuccessBlock)(TBXML *tbxml);
+typedef void (^TBXMLFailureBlock)(TBXML *tbxml, NSError *error);
+typedef void (^TBXMLIterateBlock)(TBXMLElement *element);
+typedef void (^TBXMLIterateAttributeBlock)(TBXMLAttribute *attribute, NSString *attributeName, NSString *attributeValue);
 
 
 // ================================================================================================
@@ -146,15 +148,15 @@ typedef void (^TBXMLIterateAttributeBlock)(TBXMLAttribute *, NSString*, NSString
 
 @property (nonatomic, readonly) TBXMLElement * rootXMLElement;
 
-+ (id)tbxmlWithXMLString:(NSString*)aXMLString error:(NSError **)error;
-+ (id)tbxmlWithXMLData:(NSData*)aData error:(NSError **)error;
-+ (id)tbxmlWithXMLFile:(NSString*)aXMLFile error:(NSError **)error;
-+ (id)tbxmlWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension error:(NSError **)error;
++ (id)newTBXMLWithXMLString:(NSString*)aXMLString error:(NSError **)error;
++ (id)newTBXMLWithXMLData:(NSData*)aData error:(NSError **)error;
++ (id)newTBXMLWithXMLFile:(NSString*)aXMLFile error:(NSError **)error;
++ (id)newTBXMLWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension error:(NSError **)error;
 
-+ (id)tbxmlWithXMLString:(NSString*)aXMLString __attribute__((deprecated));
-+ (id)tbxmlWithXMLData:(NSData*)aData __attribute__((deprecated));
-+ (id)tbxmlWithXMLFile:(NSString*)aXMLFile __attribute__((deprecated));
-+ (id)tbxmlWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension __attribute__((deprecated));
++ (id)newTBXMLWithXMLString:(NSString*)aXMLString __attribute__((deprecated));
++ (id)newTBXMLWithXMLData:(NSData*)aData __attribute__((deprecated));
++ (id)newTBXMLWithXMLFile:(NSString*)aXMLFile __attribute__((deprecated));
++ (id)newTBXMLWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension __attribute__((deprecated));
 
 
 - (id)initWithXMLString:(NSString*)aXMLString error:(NSError **)error;
@@ -168,8 +170,8 @@ typedef void (^TBXMLIterateAttributeBlock)(TBXMLAttribute *, NSString*, NSString
 - (id)initWithXMLFile:(NSString*)aXMLFile fileExtension:(NSString*)aFileExtension __attribute__((deprecated));
 
 
-- (void) decodeData:(NSData*)data;
-- (void) decodeData:(NSData*)data withError:(NSError **)error;
+- (int) decodeData:(NSData*)data;
+- (int) decodeData:(NSData*)data withError:(NSError **)error;
 
 @end
 

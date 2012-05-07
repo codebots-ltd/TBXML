@@ -28,7 +28,7 @@
 - (void)testLoadXMLResourceFailure
 {   
     NSError *error;
-    [TBXML tbxmlWithXMLFile:@"some-file-that-doesnt-exist.xml" error:&error];
+    [TBXML newTBXMLWithXMLFile:@"some-file-that-doesnt-exist.xml" error:&error];
     
     STAssertTrue([error code] == D_TBXML_FILE_NOT_FOUND_IN_BUNDLE, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
 }
@@ -36,7 +36,7 @@
 - (void)testLoadXMLResource
 {   
     NSError *error;
-    [TBXML tbxmlWithXMLFile:@"books.xml" error:&error];
+    [TBXML newTBXMLWithXMLFile:@"books.xml" error:&error];
     
     STAssertNil(error, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
 }
@@ -46,7 +46,7 @@
     NSData *data = nil;
     
     NSError *error;
-    [TBXML tbxmlWithXMLData:data error:&error];
+    [TBXML newTBXMLWithXMLData:data error:&error];
     
     STAssertTrue([error code] == D_TBXML_DATA_NIL, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
 }
@@ -56,7 +56,7 @@
     NSString *string = @"asdfaf uhaluhlasdh sf a";
     
     NSError *error;
-    [TBXML tbxmlWithXMLString:string error:&error];
+    [TBXML newTBXMLWithXMLString:string error:&error];
     
     STAssertTrue([error code] == D_TBXML_DECODE_FAILURE, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
 }
@@ -66,7 +66,7 @@
     NSString *string = @"<?xml version=\"1.0\"?><sdf";
     
     NSError *error;
-    [TBXML tbxmlWithXMLString:string error:&error];
+    [TBXML newTBXMLWithXMLString:string error:&error];
     
     STAssertTrue([error code] == D_TBXML_DECODE_FAILURE, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
 }
@@ -87,7 +87,7 @@
     NSString *string = @"<?xml version=\"1.0\"?><>";
     
     NSError *error;
-    TBXML * tbxml = [TBXML tbxmlWithXMLString:string error:&error];
+    TBXML * tbxml = [TBXML newTBXMLWithXMLString:string error:&error];
     
     STAssertNil(error, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
     
@@ -102,7 +102,7 @@
     NSString *string = @"<?xml version=\"1.0\"?><root></root>";
     
     NSError *error;
-    TBXML * tbxml = [TBXML tbxmlWithXMLString:string error:&error];
+    TBXML * tbxml = [TBXML newTBXMLWithXMLString:string error:&error];
     
     STAssertNil(error, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
     
@@ -117,7 +117,7 @@
     NSString *string = @"<?xml version=\"1.0\"?><root><child /><child2 /></root>";
     
     NSError *error;
-    TBXML * tbxml = [TBXML tbxmlWithXMLString:string error:&error];
+    TBXML * tbxml = [TBXML newTBXMLWithXMLString:string error:&error];
     STAssertNil(error, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
     
     TBXMLElement * element = [TBXML childElementNamed:@"child" parentElement:tbxml.rootXMLElement error:&error];
@@ -132,7 +132,7 @@
     NSString *string = @"<?xml version=\"1.0\"?><root><child attrib=\"\"/></root>";
     
     NSError *error;
-    TBXML * tbxml = [TBXML tbxmlWithXMLString:string error:&error];
+    TBXML * tbxml = [TBXML newTBXMLWithXMLString:string error:&error];
     STAssertNil(error, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
     
     TBXMLElement * element = [TBXML childElementNamed:@"child" parentElement:tbxml.rootXMLElement error:&error];
@@ -147,7 +147,7 @@
     NSString *string = @"<?xml version=\"1.0\"?><root><child attrib=\"\"/></root>";
     
     NSError *error;
-    TBXML * tbxml = [TBXML tbxmlWithXMLString:string error:&error];
+    TBXML * tbxml = [TBXML newTBXMLWithXMLString:string error:&error];
     STAssertNil(error, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
     
     TBXMLElement * element = [TBXML childElementNamed:@"child" parentElement:tbxml.rootXMLElement error:&error];
@@ -162,7 +162,7 @@
     NSString *string = @"<?xml version=\"1.0\"?><root><child></child></root>";
     
     NSError *error;
-    TBXML * tbxml = [TBXML tbxmlWithXMLString:string error:&error];
+    TBXML * tbxml = [TBXML newTBXMLWithXMLString:string error:&error];
     STAssertNil(error, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
     
     TBXMLElement * element = [TBXML childElementNamed:@"child" parentElement:tbxml.rootXMLElement error:&error];
@@ -177,7 +177,7 @@
     NSString *string = @"<?xml version=\"1.0\"?><root><child /><child2 /><child /></root>";
     
     NSError *error;
-    TBXML * tbxml = [TBXML tbxmlWithXMLString:string error:&error];
+    TBXML * tbxml = [TBXML newTBXMLWithXMLString:string error:&error];
     STAssertNil(error, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
     
     TBXMLElement * element = [TBXML childElementNamed:@"child" parentElement:tbxml.rootXMLElement error:&error];
@@ -197,7 +197,7 @@
     NSString *string = @"<?xml version=\"1.0\"?><root><child>Element Text</child></root>";
     
     NSError *error;
-    TBXML * tbxml = [TBXML tbxmlWithXMLString:string error:&error];
+    TBXML * tbxml = [TBXML newTBXMLWithXMLString:string error:&error];
     STAssertNil(error, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
     
     TBXMLElement * element = [TBXML childElementNamed:@"child" parentElement:tbxml.rootXMLElement error:&error];
@@ -211,7 +211,7 @@
 {   
     NSString *string = @"<?xml version=\"1.0\"?><root><child>Element Text</child></root>";
     
-    TBXML * tbxml = [TBXML tbxmlWithXMLString:string error:nil];
+    TBXML * tbxml = [TBXML newTBXMLWithXMLString:string error:nil];
     STAssertTrue(tbxml.rootXMLElement != nil, @"Root element is nil");
     
     TBXMLElement * element = [TBXML childElementNamed:@"child" parentElement:tbxml.rootXMLElement];
@@ -226,7 +226,7 @@
     NSString *string = @"<?xml version=\"1.0\"?><RESPONSE MSG=\"\"/>";
     
     NSError *error;
-    TBXML * tbxml = [TBXML tbxmlWithXMLString:string error:nil];
+    TBXML * tbxml = [TBXML newTBXMLWithXMLString:string error:nil];
     STAssertTrue(tbxml.rootXMLElement != nil, @"Root element is nil");
     
     NSString * value = [TBXML valueOfAttributeNamed:@"MSG" forElement:tbxml.rootXMLElement error:&error];
@@ -235,18 +235,24 @@
 }
 
 - (void)testDeprecated_tbxmlWithXMLData
-{
+{    
     NSString *string = @"abcdefg";
     NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
     
-    TBXML *tbxml = [TBXML tbxmlWithXMLData:data];
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+
+    TBXML *tbxml = [TBXML newTBXMLWithXMLData:data];
     STAssertTrue(tbxml.rootXMLElement == nil, @"Should have failed to parse");
     
     string = @"<?xml version=\"1.0\"?><root><child>Element Text</child></root>";
     data = [string dataUsingEncoding:NSUTF8StringEncoding];
     
-    tbxml = [TBXML tbxmlWithXMLData:data];
+    tbxml = [TBXML newTBXMLWithXMLData:data];
     STAssertTrue(tbxml.rootXMLElement != nil, @"Should have parsed successfully");
+
+#pragma clang diagnostic pop    
+
 }
 
 @end

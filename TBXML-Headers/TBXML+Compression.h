@@ -38,7 +38,7 @@
 //
 // FOUND HERE http://idevkit.com/forums/tutorials-code-samples-sdk/8-nsdata-base64-extension.html
 // ================================================================================================
-+ (NSData *) dataWithBase64EncodedString:(NSString *) string;
++ (NSData *) newDataWithBase64EncodedString:(NSString *) string;
 - (id) initWithBase64EncodedString:(NSString *) string;
 
 - (NSString *) base64Encoding;
