@@ -234,6 +234,21 @@
     STAssertTrue([value isEqualToString:@""], @"Returned string is not empty");
 }
 
+- (void)testDeprecated_tbxmlWithXMLData
+{
+    NSString *string = @"abcdefg";
+    NSData *data = [string dataUsingEncoding:NSUTF8StringEncoding];
+    
+    TBXML *tbxml = [TBXML tbxmlWithXMLData:data];
+    STAssertTrue(tbxml.rootXMLElement == nil, @"Should have failed to parse");
+    
+    string = @"<?xml version=\"1.0\"?><root><child>Element Text</child></root>";
+    data = [string dataUsingEncoding:NSUTF8StringEncoding];
+    
+    tbxml = [TBXML tbxmlWithXMLData:data];
+    STAssertTrue(tbxml.rootXMLElement != nil, @"Should have parsed successfully");
+}
+
 @end
 
 
