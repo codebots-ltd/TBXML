@@ -14,9 +14,6 @@
 		8290354B14D9F6B100ACF7E4 /* TBXML+Compression.m in Sources */ = {isa = PBXBuildFile; fileRef = 829FA0C914D5B55D00D18697 /* TBXML+Compression.m */; };
 		8290354C14D9F6B100ACF7E4 /* TBXML+HTTP.m in Sources */ = {isa = PBXBuildFile; fileRef = 829FA0CA14D5B55D00D18697 /* TBXML+HTTP.m */; };
 		8290354D14D9F6B100ACF7E4 /* TBXML.m in Sources */ = {isa = PBXBuildFile; fileRef = 829FA0CB14D5B55D00D18697 /* TBXML.m */; };
-		8290354E14D9F6E100ACF7E4 /* TBXML+Compression.h in Headers */ = {isa = PBXBuildFile; fileRef = 829FA0CD14D5B55D00D18697 /* TBXML+Compression.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8290354F14D9F6E100ACF7E4 /* TBXML+HTTP.h in Headers */ = {isa = PBXBuildFile; fileRef = 829FA0CE14D5B55D00D18697 /* TBXML+HTTP.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		8290355014D9F6E100ACF7E4 /* TBXML.h in Headers */ = {isa = PBXBuildFile; fileRef = 829FA0CF14D5B55D00D18697 /* TBXML.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8290355E14D9F8DA00ACF7E4 /* books.xml in Resources */ = {isa = PBXBuildFile; fileRef = 8290355914D9F8BF00ACF7E4 /* books.xml */; };
 		8290355F14D9F8DD00ACF7E4 /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 8290355A14D9F8BF00ACF7E4 /* InfoPlist.strings */; };
 		8290356014D9F8E300ACF7E4 /* TBXMLTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 8290355D14D9F8BF00ACF7E4 /* TBXMLTests.m */; };
@@ -215,9 +212,6 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8290355014D9F6E100ACF7E4 /* TBXML.h in Headers */,
-				8290354F14D9F6E100ACF7E4 /* TBXML+HTTP.h in Headers */,
-				8290354E14D9F6E100ACF7E4 /* TBXML+Compression.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
