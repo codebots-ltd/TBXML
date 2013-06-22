@@ -240,7 +240,7 @@
     if (error) *error = localError;
     
     // return success or error code
-    return localError == nil ? D_TBXML_SUCCESS : [localError code];
+    return localError == nil ? D_TBXML_SUCCESS : (int)[localError code];
 }
 
 @end
@@ -256,8 +256,7 @@
 @implementation TBXML (StaticFunctions)
 
 + (NSString*) elementName:(TBXMLElement*)aXMLElement {
-	if (nil == aXMLElement->name) return @"";
-	return [NSString stringWithCString:&aXMLElement->name[0] encoding:NSUTF8StringEncoding];
+	return [TBXML elementName:aXMLElement error:nil];
 }
 
 + (NSString*) elementName:(TBXMLElement*)aXMLElement error:(NSError **)error {
@@ -277,8 +276,7 @@
 }
 
 + (NSString*) attributeName:(TBXMLAttribute*)aXMLAttribute {
-	if (nil == aXMLAttribute->name) return @"";
-	return [NSString stringWithCString:&aXMLAttribute->name[0] encoding:NSUTF8StringEncoding];
+    return [TBXML attributeValue:aXMLAttribute error:nil];
 }
 
 + (NSString*) attributeName:(TBXMLAttribute*)aXMLAttribute error:(NSError **)error {
@@ -299,8 +297,7 @@
 
 
 + (NSString*) attributeValue:(TBXMLAttribute*)aXMLAttribute {
-	if (nil == aXMLAttribute->value) return @"";
-	return [NSString stringWithCString:&aXMLAttribute->value[0] encoding:NSUTF8StringEncoding];
+    return [TBXML attributeValue:aXMLAttribute error:nil];
 }
 
 + (NSString*) attributeValue:(TBXMLAttribute*)aXMLAttribute error:(NSError **)error {
@@ -314,8 +311,7 @@
 }
 
 + (NSString*) textForElement:(TBXMLElement*)aXMLElement {
-	if (nil == aXMLElement->text) return @"";
-	return [NSString stringWithCString:&aXMLElement->text[0] encoding:NSUTF8StringEncoding];
+    return [TBXML textForElement:aXMLElement error:nil];
 }
 
 + (NSString*) textForElement:(TBXMLElement*)aXMLElement error:(NSError **)error {
@@ -335,17 +331,7 @@
 }
 
 + (NSString*) valueOfAttributeNamed:(NSString *)aName forElement:(TBXMLElement*)aXMLElement {
-	const char * name = [aName cStringUsingEncoding:NSUTF8StringEncoding];
-	NSString * value = nil;
-	TBXMLAttribute * attribute = aXMLElement->firstAttribute;
-	while (attribute) {
-		if (strlen(attribute->name) == strlen(name) && memcmp(attribute->name,name,strlen(name)) == 0) {
-			value = [NSString stringWithCString:&attribute->value[0] encoding:NSUTF8StringEncoding];
-			break;
-		}
-		attribute = attribute->next;
-	}
-	return value;
+    return [TBXML valueOfAttributeNamed:aName forElement:aXMLElement error:nil];
 }
 
 + (NSString*) valueOfAttributeNamed:(NSString *)aName forElement:(TBXMLElement*)aXMLElement error:(NSError **)error {
@@ -370,7 +356,7 @@
             if (attribute->value[0])
                 value = [NSString stringWithCString:&attribute->value[0] encoding:NSUTF8StringEncoding];
             else
-                value = [NSString stringWithString:@""];
+                value = @"";
             
 			break;
 		}
@@ -387,16 +373,7 @@
 }
 
 + (TBXMLElement*) childElementNamed:(NSString*)aName parentElement:(TBXMLElement*)aParentXMLElement{
-    
-	TBXMLElement * xmlElement = aParentXMLElement->firstChild;
-	const char * name = [aName cStringUsingEncoding:NSUTF8StringEncoding];
-	while (xmlElement) {
-		if (strlen(xmlElement->name) == strlen(name) && memcmp(xmlElement->name,name,strlen(name)) == 0) {
-			return xmlElement;
-		}
-		xmlElement = xmlElement->nextSibling;
-	}
-	return nil;
+    return [TBXML childElementNamed:aName parentElement:aParentXMLElement error:nil];
 }
 
 + (TBXMLElement*) childElementNamed:(NSString*)aName parentElement:(TBXMLElement*)aParentXMLElement error:(NSError **)error {
@@ -427,15 +404,7 @@
 }
 
 + (TBXMLElement*) nextSiblingNamed:(NSString*)aName searchFromElement:(TBXMLElement*)aXMLElement{
-	TBXMLElement * xmlElement = aXMLElement->nextSibling;
-	const char * name = [aName cStringUsingEncoding:NSUTF8StringEncoding];
-	while (xmlElement) {
-		if (strlen(xmlElement->name) == strlen(name) && memcmp(xmlElement->name,name,strlen(name)) == 0) {
-			return xmlElement;
-		}
-		xmlElement = xmlElement->nextSibling;
-	}
-	return nil;
+    return [TBXML nextSiblingNamed:aName searchFromElement:aXMLElement error:nil];
 }
 
 + (TBXMLElement*) nextSiblingNamed:(NSString*)aName searchFromElement:(TBXMLElement*)aXMLElement error:(NSError **)error {
@@ -470,58 +439,62 @@
     NSArray *components = [query componentsSeparatedByString:@"."];
     TBXMLElement *currTBXMLElement = anElement;
     
-    // navigate down
-    for (NSInteger i=0; i < components.count; ++i) {
-        NSString *iTagName = [components objectAtIndex:i];
-        
-        if ([iTagName isEqualToString:@"*"]) {
-            currTBXMLElement = currTBXMLElement->firstChild;
-            
-            // different behavior depending on if this is the end of the query or midstream
-            if (i < (components.count - 1)) {
-                // midstream
-                do {
-                    NSString *restOfQuery = [[components subarrayWithRange:NSMakeRange(i + 1, components.count - i - 1)] componentsJoinedByString:@"."];
-                    [TBXML iterateElementsForQuery:restOfQuery fromElement:currTBXMLElement withBlock:iterateBlock];
-                } while ((currTBXMLElement = currTBXMLElement->nextSibling));
-                
-            }
-        } else {
-            currTBXMLElement = [TBXML childElementNamed:iTagName parentElement:currTBXMLElement];            
-        }
-        
-        if (!currTBXMLElement) {
-            break;
-        }
-    }
-    
     if (currTBXMLElement) {
-        // enumerate
-        NSString *childTagName = [components lastObject];
-        
-        if ([childTagName isEqualToString:@"*"]) {
-            childTagName = nil;
+        // navigate down
+        for (NSInteger i=0; i < components.count; ++i) {
+            NSString *iTagName = [components objectAtIndex:i];
+            
+            if ([iTagName isEqualToString:@"*"]) {
+                currTBXMLElement = currTBXMLElement->firstChild;
+                
+                // different behavior depending on if this is the end of the query or midstream
+                if (i < (components.count - 1)) {
+                    // midstream
+                    do {
+                        NSString *restOfQuery = [[components subarrayWithRange:NSMakeRange(i + 1, components.count - i - 1)] componentsJoinedByString:@"."];
+                        [TBXML iterateElementsForQuery:restOfQuery fromElement:currTBXMLElement withBlock:iterateBlock];
+                    } while ((currTBXMLElement = currTBXMLElement->nextSibling));
+                    
+                }
+            } else {
+                currTBXMLElement = [TBXML childElementNamed:iTagName parentElement:currTBXMLElement];
+            }
+            
+            if (!currTBXMLElement) {
+                break;
+            }
         }
         
-        do {
-            iterateBlock(currTBXMLElement);
-        } while (childTagName ? (currTBXMLElement = [TBXML nextSiblingNamed:childTagName searchFromElement:currTBXMLElement]) : (currTBXMLElement = currTBXMLElement->nextSibling));
+        if (currTBXMLElement) {
+            // enumerate
+            NSString *childTagName = [components lastObject];
+            
+            if ([childTagName isEqualToString:@"*"]) {
+                childTagName = nil;
+            }
+            
+            do {
+                iterateBlock(currTBXMLElement);
+            } while (childTagName ? (currTBXMLElement = [TBXML nextSiblingNamed:childTagName searchFromElement:currTBXMLElement]) : (currTBXMLElement = currTBXMLElement->nextSibling));
+        }
     }
 }
 
 + (void)iterateAttributesOfElement:(TBXMLElement *)anElement withBlock:(TBXMLIterateAttributeBlock)iterateAttributeBlock {
-
-    // Obtain first attribute from element
-    TBXMLAttribute * attribute = anElement->firstAttribute;
     
-    // if attribute is valid
-    
-    while (attribute) {
-        // Call the iterateAttributeBlock with the attribute, it's name and value
-        iterateAttributeBlock(attribute, [TBXML attributeName:attribute], [TBXML attributeValue:attribute]);
+    if (anElement) {
+        // Obtain first attribute from element
+        TBXMLAttribute * attribute = anElement->firstAttribute;
         
-        // Obtain the next attribute
-        attribute = attribute->next;
+        // if attribute is valid
+        
+        while (attribute) {
+            // Call the iterateAttributeBlock with the attribute, it's name and value
+            iterateAttributeBlock(attribute, [TBXML attributeName:attribute], [TBXML attributeValue:attribute]);
+            
+            // Obtain the next attribute
+            attribute = attribute->next;
+        }
     }
 }
 
@@ -597,7 +570,7 @@
     
     if (error) *error = localError;
         
-    return localError == nil ? D_TBXML_SUCCESS : [localError code];
+    return localError == nil ? D_TBXML_SUCCESS : (int)[localError code];
 }
 
 - (void) decodeBytes {
