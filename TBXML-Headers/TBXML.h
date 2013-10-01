@@ -27,6 +27,9 @@
 //  THE SOFTWARE.
 // ================================================================================================
 
+#ifndef TBXML_H
+#define TBXML_H
+
 @class TBXML;
 
 
@@ -208,3 +211,5 @@ typedef void (^TBXMLIterateAttributeBlock)(TBXMLAttribute *attribute, NSString *
 
 
 @end
+
+#endif
