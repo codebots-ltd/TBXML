@@ -1,3 +1,7 @@
+
+(NOTE: This is an update of original 71squared/TBXML. I don't know if the main author is still active there.
+But I know my version of it does compile on iOS devices and works with Xcode 5.0.1. -- flagsoft)
+
 ### What is TBXML
 
 TBXML is a light-weight XML document parser written in Objective-C designed for use on Apple iPad, iPhone & iPod Touch devices (also Mac OSX compatible). TBXML aims to provide the fastest possible XML parsing whilst utilising the fewest resources. This requirement for absolute efficiency is achieved at the expense of XML validation and modification. It is not possible to modify and generate valid XML from a TBXML object and no validation is performed whatsoever whilst importing and parsing an XML document.
