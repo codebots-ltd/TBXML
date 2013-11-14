@@ -41,6 +41,154 @@
     STAssertNil(error, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
 }
 
+
+/*
+ 
+ <?xml version="1.0"?>
+ <authors>
+ 
+    <author name="AUTHOR NAME">
+        <book title="TITLE" price="1.10">
+ 
+            <description>
+                Descr A
+            </description>
+        </book>
+ 
+        <book title="TITLE B" price="2.20">
+            <description>
+                    Descr B
+            </description>
+        </book>
+
+    </author>
+
+</authors>
+
+ */
+
+//NSMutableArray *records;
+
+- (void)testSimpleQuery_main
+{
+    NSError *error;
+    TBXML *tbxml;
+
+    
+    //records = [NSMutableArray array];
+    
+    tbxml = [TBXML newTBXMLWithXMLFile:@"books.xml" error:&error];
+
+    if (tbxml.rootXMLElement) {
+        [self testSimpleQuery_traverseElement:tbxml.rootXMLElement];
+    } else {
+       NSLog(@"ERROR");
+        STAssertTrue([error code] == D_TBXML_DATA_NIL, @"Incorrect Error Returned %@ %@", [error localizedDescription], [error userInfo]);
+    }
+
+}
+
+- (void) testSimpleQuery_traverseElement:(TBXMLElement *)element {
+    
+    do {
+        
+        //
+        // Display the name of the element
+        //
+
+        /*NSLog(@"\n");
+        NSLog(@"-----------------------------------------------------");
+        NSLog(@"- TBXML elementName = %@", [TBXML elementName:element]);*/
+
+    
+        //
+        // -- match /authors/author
+        //
+        
+        if ([[TBXML elementName:element] isEqualToString:@"author"]) {
+
+            // -- get //author/@name
+            TBXMLAttribute *attribute = element->firstAttribute;
+            NSString *myAuthor = [TBXML attributeValue:attribute];
+
+            NSLog(@"-----------------------------------------------------");
+            NSLog(@"-+ //author/@name = \"%@\"", myAuthor);
+            
+        }
+
+        //
+        // -- match /authors/author/book
+        //
+        
+        if ([[TBXML elementName:element] isEqualToString:@"book"]) {
+            
+            // -- ok, we got book
+          
+            //  <book title="TITLE" price="1.10">
+
+            TBXMLAttribute *attribute = element->firstAttribute;
+            
+            NSString *myTitle = [TBXML attributeValue:attribute];  // note: we assume that the title attribut comes first
+            
+            attribute = attribute->next;  // point to next attribute (price here)
+            
+            NSString *myPrice = [TBXML attributeValue:attribute];
+            
+            NSLog(@" +- //author/book/@title: \"%@\"", myTitle);
+            NSLog(@" +- //author/book/@price: \"%@\"", myPrice);
+            
+        }
+        
+        if ([[TBXML elementName:element] isEqualToString:@"description"]) {
+            // -- ok, we got description
+            //  <description>Bla bla bla...</decriptiopn>
+            NSString * description = [TBXML textForElement:element];
+            NSLog(@"  \\- //author/book/description: \"%@\"", description);
+        }
+        
+    
+    
+        //
+        // -- display all XML ATTRIBUTES if any
+        // see: http://www.tbxml.co.uk/TBXML/Guides_-_Traversing_Unknown_elements___attributes.html
+
+        // Obtain first attribute from element
+        
+        /*
+         TBXMLAttribute *attribute = element->firstAttribute;
+
+        bool FLAG_thereAreAttributes = NO;
+        
+        while (attribute) {
+
+            // -- attribute is valid
+            FLAG_thereAreAttributes = YES;
+
+            // Display name and value of attribute to the log window
+            NSLog(@" -- XML-ATTRIBUT: //%@/@%@ = \"%@\"",
+                  [TBXML elementName:element],
+                  [TBXML attributeName:attribute],
+                  [TBXML attributeValue:attribute]);
+            
+            // Obtain the next attribute
+            attribute = attribute->next;
+        }
+
+        if (FLAG_thereAreAttributes == NO ) {
+            NSLog(@" -- XML-ATTRIBUT: (no attrubutes for this element)");
+        }
+        */
+
+        
+        if (element->firstChild) {
+            // do recursion
+            [self testSimpleQuery_traverseElement:element->firstChild];
+        }
+
+        
+    } while ((element = element->nextSibling));
+}
+
 - (void)testDataIsNil
 {   
     NSData *data = nil;
