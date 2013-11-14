@@ -370,7 +370,7 @@
             if (attribute->value[0])
                 value = [NSString stringWithCString:&attribute->value[0] encoding:NSUTF8StringEncoding];
             else
-                value = [NSString stringWithString:@""];
+                value = @"";  // Xcode Version 5.0.1 (5A2053): Using 'stringWithString:' with a literal is redundant
             
 			break;
 		}

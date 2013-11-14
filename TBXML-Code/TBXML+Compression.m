@@ -230,7 +230,7 @@ static char encodingTable[64] = {
 	strm.opaque = Z_NULL;
 	strm.total_out = 0;
 	strm.next_in=(Bytef *)[self bytes];
-	strm.avail_in = [self length];
+	strm.avail_in = (unsigned int)[self length];  // Implicit vonversion loses integer precision: 'NSUInteger' (aka 'unsigned long') to 'uInt' (aka 'unsigned int')
 	
 	// Compresssion Levels:
 	//   Z_NO_COMPRESSION
