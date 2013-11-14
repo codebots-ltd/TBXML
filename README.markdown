@@ -1,6 +1,5 @@
-
 (NOTE: This is an update of original 71squared/TBXML. I don't know if the main author is still active there.
-But I know my version of it does compile on iOS devices and works with Xcode 5.0.1. -- flagsoft)
+But I know my version of it does compile on iOS devices and works with Xcode 5.0.1. -- flagsoft, 14.NOV.2013)
 
 ### What is TBXML
 
